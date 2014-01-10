@@ -1,0 +1,22 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+#floorplan {
+  position: relative;
+  background-image: url("/images/pavilion.png");
+  width: 2072px;
+  height:1114px;
+}
+
+canvas {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 1000000;
+}
