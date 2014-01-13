@@ -1,14 +1,16 @@
-
 /**
  * Module dependencies.
  */
+var mongoose = require('mongoose')
+mongoose.connect('mongodb://127.0.0.1/nrf-heatmap');
+require('./models/booth');
 
 var express = require('express');
 var routes = require('./routes');
 var user = require('./routes/user');
+var votes = require('./routes/votes');
 var http = require('http');
 var path = require('path');
-
 var app = express();
 
 // all environments
@@ -28,7 +30,9 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/users', user.list);
+//app.get('/users', user.list);
+app.get('/votes', votes.getvotes);
+app.post('/votes', votes.postvotes);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

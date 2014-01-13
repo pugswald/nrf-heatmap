@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  h1= title
+  - for (var e=0; e<errors.length; e++)
+    div(style="color:red")= errors[e]
+    br
+  if votes_processed
+    p(style="color:green")= 'Successfully processed '+votes_processed+' votes'
+  p Submit your votes
+  form(method="post")
+    | API Key:
+    input(type="text", name="apikey", maxlength="20")
+    br
+    | Newest Votes:
+    br
+    textarea(name="votes", rows="20", cols="50")
+    br
+    input(type="submit", value="Submit")

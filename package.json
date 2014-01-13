@@ -8,6 +8,8 @@
   "dependencies": {
     "express": "3.4.0",
     "jade": "*",
-    "xml2js":"*"
+    "xml2js":"*",
+    "mongodb":"*",
+    "mongoose":"*"
   }
 }
