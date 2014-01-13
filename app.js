@@ -9,6 +9,7 @@ var express = require('express');
 var routes = require('./routes');
 var user = require('./routes/user');
 var votes = require('./routes/votes');
+var hm_data = require('./routes/hm_data');
 var http = require('http');
 var path = require('path');
 var app = express();
@@ -33,6 +34,7 @@ app.get('/', routes.index);
 //app.get('/users', user.list);
 app.get('/votes', votes.getvotes);
 app.post('/votes', votes.postvotes);
+app.get('/status', hm_data.status);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

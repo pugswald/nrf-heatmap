@@ -3,9 +3,6 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
-    script(type='text/javascript', src='javascripts/heatmap.js')
-    script(type='text/javascript', src='javascripts/pavilion.js')
-    script(type='text/javascript', src='javascripts/stage.js')
-    script(type='text/javascript', src='javascripts/main.js')
+    block scripts
   body
     block content

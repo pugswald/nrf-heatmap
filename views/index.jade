@@ -1,7 +1,14 @@
 extends layout
+block scripts
+  script(type='text/javascript', src='javascripts/heatmap.js')
+  script(type='text/javascript', src='javascripts/pavilion.js')
+  script(type='text/javascript', src='javascripts/stage.js')
+  script(type='text/javascript', src='javascripts/main.js')
+  script(type='text/javascript', src='//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
 
 block content
-  h1= title
-  p Welcome to #{title}
-  #floorplan
-    canvas(width=2072, height=1137)
+  #pavilion
+  #stage
+  div.title.outline= title
+  div#one.outline One
+  div#two.outline.notshown Two

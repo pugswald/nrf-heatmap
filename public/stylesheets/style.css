@@ -1,22 +1,61 @@
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
 }
+.outline {
+    font-size: 30px;
+  color: white;
+  text-shadow:
+  -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;  
+}
+  
+.title {
+  padding:20px 100px 20px 40px;
+  position: absolute;
+  top:0;
+  left:0;
+  background-image: linear-gradient(to right, rgba(0,0,255,1), rgba(0,0,255,0));
 
-#floorplan {
-  position: relative;
+}
+#one {
+  position: absolute;
+  top:20px;
+  left:260px;
+  z-index: 100000000;
+}
+#two {
+  position: absolute;
+  top:20px;
+  left:330px;
+  z-index: 100000000;
+}
+.notshown{
+  color: grey;
+}
+  
+#pavilion {
+  position: absolute;
+  top:0;
+  left:0;
   background-image: url("/images/pavilion.png");
   width: 2072px;
   height:1114px;
 }
-
-canvas {
+#stage {
   position: absolute;
-  top: 0px;
-  left: 0px;
-  z-index: 1000000;
+  top:0;
+  left:0;
+  background-image: url("/images/stage.png");
+  width: 824px;
+  height:1137px;
+}
+
+
+
 }

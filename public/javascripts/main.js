@@ -5,115 +5,94 @@ app.config = {
 app.LAYOUTS ={"pavilion":{"coords":pavilion_coords,"img":"images/pavilion.png"},
 	      "stage":{"coords":stage_coords,"img":"images/stage.png"}
 };
-
 window.onload = function(){
   app.init = function initialize(){
     var cfg = arguments[0] || {};
     var config = {};
-    config.element = "floorplan";
+    config.element = "pavilion";
     config.radius = cfg.radius || 20;
     config.visible = true;
     config.opacity = 40;
     if(cfg.gradient)
       config.gradient = cfg.gradient;
-    config.gradient={.9:"#cc0000",.8:"#ff0000",.7:"#ff9900",.6:"#ffff00",.5:"#66ff00",.4:"#006600",.3:"#00ccff",.2:"#0000cc",.1:"#999999"}
+    //config.gradient={.9:"#cc0000",.8:"#ff0000",.7:"#ff9900",.6:"#ffff00",.5:"#66ff00",.4:"#006600",.3:"#00ccff",.2:"#0000cc",.1:"#999999"};
+    config.gradient={.9:"#cc0000",.6:"#ffff00",.3:"#00ccff"};
     app.coordinates = app.LAYOUTS[cfg.layout || "main"];
-    if(cfg.layout)
-      $("floorplan").style.backgroundImage = cfg.layout.img;
     var heatmap = h337.create(config);
-    app.heatmap = heatmap;
+    app.pavilion_heatmap = heatmap;
+    config.element = "stage";
+    heatmap = h337.create(config);
+    app.stage_heatmap = heatmap;
   };
   app.init();
   //var typeField = document.getElementById("typefield");
-var repaint = function(){
-  // generate data object
-  var data = [];
-  var incomingdata = randomdata(pavilion_coords);
-  var max = 0;
-  var minx=9999;
-  var miny=9999;
-  var maxx=0;
-  var maxy=0;
-  //temp = {},
-  //text = typeField.value,
-  //tlen = text.length,
-  //coordinates = app.coordinates;
-  var coordinates=pavilion_coords;
-  for(var boothid in incomingdata){
-    var booth = coordinates[boothid];
-    // TODO: Verify data coming in is good
-    var val = incomingdata[boothid];
-    var x=parseInt(booth.x)+parseInt(booth.w)/2;
-    var y=parseInt(booth.y)-575+parseInt(booth.h)/2;
-    data.push({x: x, y: y, count: val});
-    if(val > max)
-      max = val;
-    if (y>maxy) maxy=y;
-    if (y<miny) miny=y;
-    if (x>maxx) maxx=x;
-    if (x<minx) minx=x;
+  var repaint = function(incomingdata){
+    //incomingdata = randomdata(pavilion_coords).concat(randomdata(stage_coords));
+    var stage_data = [];
+    var pavilion_data = [];
+    var stage_max = 80;
+    var pavilion_max = 80;
+    for(var idi=0; idi<incomingdata.length; idi++){
+      var boothid = incomingdata[idi].booth;
+      var booth;
+      if (boothid in pavilion_coords){
+	booth = pavilion_coords[boothid];
+      } else if (boothid in stage_coords){
+	booth = stage_coords[boothid];
+      } else {
+	console.log('Invalid booth id: '+boothid);
+      }
+      // TODO: Verify data coming in is good
+      var val = incomingdata[idi].votes;
+      // TODO: Save time by putting this into def file
+      var x=parseInt(booth.x)+parseInt(booth.w)/2;
+      var y=parseInt(booth.y)-575+parseInt(booth.h)/2;
+      if (boothid in pavilion_coords){
+	pavilion_data.push({x: x, y: y, count: val});
+	if(val > pavilion_max)
+	  pavilion_max = val;
+      } else if (boothid in stage_coords){
+	stage_data.push({x: x, y: y, count: val});
+	if(val > stage_max)
+	  stage_max = val;
+      } 
+    }
+    app.pavilion_heatmap.store.setDataSet({max: pavilion_max, data: pavilion_data});
+    app.stage_heatmap.store.setDataSet({max: stage_max, data: stage_data});
   }
-  console.log('Bounding rectangle '+minx+','+miny+' to '+maxx+','+maxy);
-  app.heatmap.store.setDataSet({max: max, data: data});
-}
-var randomdata = function(dataset) {
-  // Return random heatmap data for each item
-  var rdat={};
-  for (var booth in dataset){
-    rdat[booth]=Math.random()*100;
+  var randomdata = function(dataset) {
+    // Return random heatmap data for each item
+    var rdat=[];
+    for (var booth in dataset){
+      rdat.push({booth:booth, votes:Math.random()*100});
+    }
+    return rdat;
   }
-  return rdat;
-}
-/*
-var len = typeField.value.length;
-typeField.onkeypress = function(e){
-  // ignore cursor IE hack
-  if(e.charCode == 0 && [37, 38, 39, 40].indexOf(e.keyCode) > -1)
-    return;
-  var key = String.fromCharCode(e.charCode || e.keyCode);
-  if(/^[A-Za-z]$/.test(key)){
-    key = key.toUpperCase();
-  }
-  if(app.config.exclude && app.EXCLUDES.indexOf(key) == -1){
-    var coord = app.coordinates[key]
-    coord && app.heatmap.store.addDataPoint.apply(app.heatmap.store,coord);
-  }
-};
 
-typeField.onkeyup = function(e){
-  if(Math.abs(len-this.value.length) > 1 || e.keyCode == 8){
-    repaint();
+  $("#one").on('click', function(){
+    $("#stage").hide();
+    $("#pavilion").show();
+    $("#two").addClass("notshown");
+    $("#one").removeClass("notshown");
+  });
+  $("#two").on('click', function(){
+    $("#pavilion").hide();
+    $("#stage").show();
+    $("#one").addClass("notshown");
+    $("#two").removeClass("notshown");
+  });
+  $("#stage").hide();
+  var do_update = function(){
+    // Loads initial data and calls repaint() on load of data
+    $.ajax({url:'status',dataType:'json'}).done(function(incomingdata){
+      //console.log('received');
+      //console.log(incomingdata);
+      repaint(incomingdata);
+      setTimeout(do_update,10000);
+    }).fail(function(){console.log('Failure in pulling data');});
   }
-  len = this.value.length;
-};
-*/
-var items = document.getElementsByTagName("li");
-for(var i=0; i < items.length; i++){
-  (function(i){
-    items[i].onclick = function(){
-      typeField.value = app.SAMPLE_TEXT[i];
-      repaint();
-    };
-  })(i);
-}
-var $ = function(id){
-  return document.getElementById(id);
-};
-var gradients = [
-{ 0.45: "rgb(0,0,255)", 0.55: "rgb(0,255,255)", 0.65: "rgb(0,255,0)", 0.95: "yellow", 1.0: "rgb(255,0,0)"},
-{ 0.45: "rgb(255,255,255)", 0.70: "rgb(0,0,0)",0.9: "rgb(2,255,246)", 1.0: "rgb(3,34,66)"},
-{ 0.45: "rgb(216,136,211)", 0.55: "rgb(0,255,255)", 0.65: "rgb(233,59,233)", 0.95: "rgb(255,0,240)", 1.0: "yellow"}
-];
-/*
-$("apply").onclick = function(){
-  var cfg = {};
-  cfg.radius = Math.pow(10,$("fingertip").selectedIndex) +40;
-  cfg.gradient = gradients[$("gradient").selectedIndex];
-  cfg.layout = $("layout").value;
-  app.heatmap.cleanup();
-  app.init(cfg);
-  repaint();
-}
-*/
-repaint();
+      
+    
+  do_update();
+
 };

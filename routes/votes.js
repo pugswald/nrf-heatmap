@@ -11,7 +11,6 @@ exports.getvotes = function(req, res){
 
 var createOrUpdateBooth = function(clean_vote) {
   BoothModel.findOne({booth:clean_vote[0]}, function(err,booth){
-    console.log('cv0 is '+ clean_vote[0] );
     if (err){
       errors.push('Server problem - check logs');
       console.log(msgs);
